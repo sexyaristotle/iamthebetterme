@@ -1601,21 +1601,21 @@
 
     document.getElementById('save-day-btn').addEventListener('click', () => {
       if (currentDay == null) return;
-      const day = days[currentDay];
+      const dayIndex = currentDay; // capture before closeDay() nullifies it
+      const day = days[dayIndex];
       const pct = calcDayPct(day);
       day.complete = pct >= settings.threshold;
       day.partial  = !day.complete && pct > 0;
       save(); renderGrid(); updateStats(); closeDay();
 
       if (day.complete) {
-        // Check if this was the final day
-        if (currentDay === settings.totalDays - 1) {
+        if (dayIndex === settings.totalDays - 1) {
           setTimeout(openCompletionScreen, 600);
         } else {
-          toast(`Day ${currentDay+1} complete ✦`);
+          toast(`Day ${dayIndex+1} complete ✦`);
         }
       } else if (day.partial) {
-        toast(`Day ${currentDay+1} logged — keep going`);
+        toast(`Day ${dayIndex+1} logged — keep going`);
       }
     });
 
