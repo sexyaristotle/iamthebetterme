@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Habit Mirror ✦</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Syne:wght@400;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --pink:       #ff2d78;
+      --pink-light: #ff6fa8;
+      --pink-pale:  #ffe0ec;
+      --hot:        #cc0055;
+      --black:      #0a0a0a;
+      --dark:       #111115;
+      --panel:      #18181d;
+      --border:     #2a2a35;
+      --text:       #f5f0ff;
+      --text-dim:   rgba(245,240,255,0.5);
+      --accent:     #b8ff57;
+      --purple:     #c084fc;
+      --yellow:     #ffe566;
+    }
+
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;
+      background: var(--black);
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9998;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px,
+        rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px
+      );
+    }
+
+    /* ============================================================ INTRO */
+    #intro-screen {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden; background: var(--black);
+    }
+
+    #intro-screen::before {
+      content: '';
+      position: absolute; inset: -40px;
+      background-image:
+        linear-gradient(rgba(255,45,120,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,45,120,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridDrift 20s linear infinite;
+    }
+
+    #intro-screen::after {
+      content: '';
+      position: absolute;
+      width: 520px; height: 520px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,45,120,0.16) 0%, transparent 70%);
+      pointer-events: none;
+      animation: orbPulse 4s ease-in-out infinite alternate;
+    }
+
+    @keyframes gridDrift { 0% { transform: translate(0,0); } 100% { transform: translate(40px,40px); } }
+    @keyframes orbPulse { 0% { transform: scale(0.9); opacity: 0.7; } 100% { transform: scale(1.15); opacity: 1; } }
+
+    .intro-content {
+      position: relative; z-index: 10;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: 0 24px;
+    }
+
+    .boot-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.15em;
+      color: var(--pink); margin-bottom: 8px;
+      opacity: 0; animation: fadeIn 0.3s ease 0.2s forwards;
+    }
+
+    .boot-bar-wrap {
+      width: 220px; height: 4px;
+      background: rgba(255,255,255,0.08);
+      margin-bottom: 42px; overflow: hidden;
+      opacity: 0; animation: fadeIn 0.3s ease 0.2s forwards;
+    }
+
+    .boot-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--pink), var(--accent));
+      width: 0%; animation: bootLoad 1.8s cubic-bezier(0.4,0,0.2,1) 0.4s forwards;
+    }
+
+    @keyframes bootLoad { 0%{width:0%} 60%{width:75%} 80%{width:82%} 100%{width:100%} }
+
+    .intro-headline {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(3.4rem, 11vw, 7.5rem);
+      line-height: 0.9; letter-spacing: -0.02em;
+      margin-bottom: 6px;
+      opacity: 0; animation: slideUp 0.8s cubic-bezier(0.16,1,0.3,1) 1.6s forwards;
+    }
+
+    .headline-top { display: block; color: var(--text); }
+    .headline-bottom {
+      display: block; color: var(--pink);
+      -webkit-text-stroke: 2px var(--hot);
+      paint-order: stroke fill;
+    }
+
+    .intro-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: clamp(0.62rem, 1.5vw, 0.78rem);
+      color: var(--text-dim); letter-spacing: 0.08em;
+      margin-top: 22px; margin-bottom: 42px;
+      opacity: 0; animation: slideUp 0.7s cubic-bezier(0.16,1,0.3,1) 2.1s forwards;
+    }
+
+    .intro-sub span { color: var(--accent); }
+
+    .intro-cta {
+      opacity: 0; animation: slideUp 0.7s cubic-bezier(0.16,1,0.3,1) 2.4s forwards;
+    }
+
+    .cta-btn {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.85rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--black); background: var(--pink); border: none;
+      padding: 16px 42px; cursor: pointer;
+      box-shadow: 4px 4px 0px var(--hot), 8px 8px 0px rgba(204,0,85,0.2);
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .cta-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0px var(--hot), 12px 12px 0px rgba(204,0,85,0.2); }
+    .cta-btn:active { transform: translate(2px,2px); box-shadow: 2px 2px 0px var(--hot); }
+
+    .deco {
+      position: absolute; pointer-events: none; font-size: 1.1rem;
+      opacity: 0; animation: decoFloat linear infinite;
+    }
+
+    @keyframes decoFloat {
+      0%   { opacity:0; transform:translateY(0) rotate(0deg); }
+      10%  { opacity:1; }
+      90%  { opacity:1; }
+      100% { opacity:0; transform:translateY(-90px) rotate(360deg); }
+    }
+
+    @keyframes fadeIn { to { opacity:1; } }
+    @keyframes slideUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+
+    /* ============================================================ MODAL */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px; z-index: 200;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-overlay.active { opacity:1; pointer-events:all; }
+
+    .setup-modal {
+      width: 100%; max-width: 520px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      outline: 3px solid var(--pink);
+      outline-offset: 3px;
+      padding: 38px 32px 28px;
+      transform: scale(0.95) translateY(12px);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1);
+      position: relative;
+    }
+
+    .modal-overlay.active .setup-modal { transform: scale(1) translateY(0); }
+
+    .modal-tag {
+      position: absolute; top: -13px; left: 22px;
+      background: var(--pink); color: var(--black);
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.62rem; letter-spacing: 0.18em; text-transform: uppercase;
+      padding: 3px 10px;
+    }
+
+    .modal-title {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.65rem; color: var(--text); margin-bottom: 5px; letter-spacing: -0.01em;
+    }
+
+    .modal-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; color: var(--text-dim); margin-bottom: 28px;
+    }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+    .form-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--pink-light);
+    }
+
+    .form-input {
+      background: var(--dark); border: 1px solid var(--border);
+      border-bottom: 2px solid var(--border);
+      padding: 10px 12px; font-size: 0.88rem; color: var(--text);
+      font-family: 'Syne', sans-serif; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; width: 100%;
+    }
+
+    .form-input:focus { border-color: var(--pink); border-bottom-color: var(--pink); box-shadow: 0 0 0 2px rgba(255,45,120,0.12); }
+    .form-input::placeholder { color: rgba(255,255,255,0.16); font-size: 0.8rem; }
+
+    .habits-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--pink-light); margin-bottom: 10px;
+    }
+
+    .habit-inputs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 26px; }
+
+    .modal-footer {
+      display: flex; justify-content: flex-end; align-items: center;
+      gap: 14px; padding-top: 18px; border-top: 1px solid var(--border);
+    }
+
+    .btn-ghost {
+      background: none; border: none; color: var(--text-dim);
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.1em; cursor: pointer; padding: 8px; transition: color 0.2s;
+    }
+
+    .btn-ghost:hover { color: var(--text); }
+
+    .btn-primary {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+      background: var(--pink); color: var(--black); border: none;
+      padding: 12px 24px; cursor: pointer;
+      box-shadow: 3px 3px 0 var(--hot);
+      transition: all 0.12s;
+    }
+
+    .btn-primary:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--hot); }
+    .btn-primary:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--hot); }
+
+    /* ============================================================ TRACKER */
+    #tracker-screen {
+      position: fixed; inset: 0;
+      display: none; flex-direction: column;
+      background: var(--dark); overflow: hidden;
+    }
+
+    #tracker-screen.active { display: flex; }
+
+    #tracker-screen::before {
+      content: '';
+      position: absolute; top:0; left:0; right:0; height: 220px;
+      background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(255,45,120,0.1) 0%, transparent 100%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .tracker-header {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,10,10,0.6); backdrop-filter: blur(8px);
+      flex-shrink: 0;
+    }
+
+    .header-brand { display: flex; align-items: baseline; gap: 10px; }
+
+    .brand-name {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.3rem; color: var(--pink); letter-spacing: -0.01em;
+    }
+
+    .brand-tag {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.56rem; color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 16px; }
+
+    .stats-pills { display: flex; gap: 8px; }
+
+    .stat-pill {
+      display: flex; flex-direction: column; align-items: center;
+      background: var(--panel); border: 1px solid var(--border);
+      padding: 6px 14px; min-width: 52px;
+    }
+
+    .stat-pill-val {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1.2rem; line-height: 1; color: var(--text);
+    }
+
+    .stat-pill-val.pink { color: var(--pink); }
+    .stat-pill-val.green { color: var(--accent); }
+
+    .stat-pill-lbl {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.5rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-dim); margin-top: 2px;
+    }
+
+    .reset-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.12em; text-transform: uppercase;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--text-dim); padding: 7px 12px; cursor: pointer; transition: all 0.2s;
+    }
+
+    .reset-btn:hover { border-color: rgba(255,80,80,0.4); color: rgba(255,100,100,0.85); }
+
+    .progress-section {
+      position: relative; z-index: 5;
+      padding: 14px 28px 0; flex-shrink: 0; display: none;
+    }
+
+    .progress-section.visible { display: block; }
+
+    .progress-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+
+    .progress-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim);
+    }
+
+    .progress-pct { font-family: 'Archivo Black', sans-serif; font-size: 0.85rem; color: var(--pink); }
+
+    .progress-track {
+      height: 6px; background: var(--panel); border: 1px solid var(--border); overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--hot), var(--pink), var(--pink-light), var(--accent));
+      width: 0%; transition: width 0.7s cubic-bezier(0.16,1,0.3,1); position: relative;
+    }
+
+    .progress-fill::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+      animation: shimmer 2s linear infinite;
+    }
+
+    @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+
+    .notes-area {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 24px 28px 48px; position: relative; z-index: 5;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+
+    .notes-area::-webkit-scrollbar { width: 3px; }
+    .notes-area::-webkit-scrollbar-thumb { background: var(--border); }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 16px; max-width: 1100px; margin: 0 auto;
+    }
+
+    @media (max-width: 560px) {
+      .notes-grid { gap: 8px; }
+      .tracker-header { padding: 14px 16px; }
+      .notes-area { padding: 18px 10px 40px; }
+      .stats-pills { display: none; }
+    }
+
+    /* Threshold pills */
+    .threshold-pills {
+      display: flex; gap: 6px; margin-top: 2px;
+    }
+
+    .thresh-pill {
+      flex: 1; cursor: pointer;
+    }
+
+    .thresh-pill input { display: none; }
+
+    .thresh-pill span {
+      display: block; text-align: center;
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.78rem; letter-spacing: 0.06em;
+      padding: 9px 4px;
+      background: var(--dark); border: 1px solid var(--border);
+      color: var(--text-dim);
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+
+    .thresh-pill input:checked + span {
+      background: var(--pink); border-color: var(--pink);
+      color: var(--black); box-shadow: 2px 2px 0 var(--hot);
+    }
+
+    /* Habit + frequency row */
+    .habit-inputs-grid {
+      display: flex; flex-direction: column; gap: 8px; margin-bottom: 26px;
+    }
+
+    .habit-freq-row {
+      display: flex; gap: 8px; align-items: center;
+    }
+
+    .habit-freq-row .form-input { flex: 1; }
+
+    .freq-picker {
+      display: flex; gap: 3px; flex-shrink: 0;
+    }
+
+    .freq-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.04em;
+      width: 28px; height: 38px;
+      background: var(--dark); border: 1px solid var(--border);
+      color: var(--text-dim); cursor: pointer;
+      transition: all 0.12s;
+    }
+
+    .freq-btn.active {
+      background: var(--pink); border-color: var(--pink);
+      color: var(--black); box-shadow: 2px 2px 0 var(--hot);
+    }
+
+    .freq-btn:hover:not(.active) { border-color: var(--pink); color: var(--pink-light); }
+
+    /* Habit check row — multiple checks for frequency > 1 */
+    .habit-checks {
+      display: flex; gap: 5px; flex-shrink: 0;
+    }
+
+    .habit-check {
+      width: 22px; height: 22px; border: 2px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.65rem; color: transparent;
+      font-family: 'Space Mono', monospace; transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .habit-check.checked {
+      background: var(--pink); border-color: var(--pink); color: var(--black);
+      box-shadow: 2px 2px 0 var(--hot);
+    }
+
+    /* ---- STICKY ---- */
+    .sticky {
+      position: relative; aspect-ratio: 1 / 1.05;
+      cursor: pointer; user-select: none;
+      transform: rotate(var(--tilt, 0deg));
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      background:
+        linear-gradient(165deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 28%),
+        repeating-linear-gradient(92deg, rgba(0,0,0,0.014) 0px, rgba(0,0,0,0) 2px, rgba(255,255,255,0.01) 4px, rgba(0,0,0,0) 6px),
+        #f5e04a;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.55), 2px 2px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .sticky::before {
+      content: ''; position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+      width: 26px; height: 12px; background: rgba(220,235,255,0.55); z-index: 3;
+      box-shadow: 1px 1px 0 rgba(0,0,0,0.2);
+    }
+
+    .sticky:hover {
+      transform: translateY(-6px) rotate(calc(var(--tilt,0deg)*0.3)) scale(1.06);
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.6), 3px 3px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.7);
+      z-index: 20;
+    }
+
+    /* Complete — pink with full X */
+    .sticky.done {
+      background:
+        linear-gradient(165deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0) 28%),
+        #ffb3d0;
+    }
+
+    /* Partial — muted dark yellow, showed up but didn't hit threshold */
+    .sticky.partial {
+      background:
+        linear-gradient(165deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 28%),
+        #9a8415;
+      filter: saturate(0.6);
+    }
+
+    .sticky.today { outline: 2px solid var(--pink); outline-offset: 3px; }
+
+    .sticky-x {
+      position: absolute; inset: 10px; pointer-events: none; z-index: 4; display: none;
+    }
+
+    .sticky.done .sticky-x { display: block; }
+
+    .sticky-x::before, .sticky-x::after {
+      content: ''; position: absolute;
+      top: 50%; left: 4px; right: 4px; height: 4px;
+      background: rgba(180,0,70,0.75); border-radius: 1px;
+    }
+
+    .sticky-x::before { transform: translateY(-50%) rotate(38deg); }
+    .sticky-x::after  { transform: translateY(-50%) rotate(-38deg); }
+
+    .sticky-inner {
+      position: relative; z-index: 2; width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 14px 8px 10px; gap: 2px;
+    }
+
+    .sticky-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.43rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(20,15,5,0.4);
+    }
+
+    .sticky-num {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: clamp(1rem, 2vw, 1.7rem); line-height: 1;
+      color: rgba(20,10,5,0.85); letter-spacing: -0.02em;
+    }
+
+    .sticky.done .sticky-num, .sticky.done .sticky-label { opacity: 0.4; }
+    .sticky.partial .sticky-num { color: rgba(255,235,150,0.75); }
+    .sticky.partial .sticky-label { color: rgba(255,235,150,0.4); }
+
+    .empty-state {
+      grid-column: 1/-1; text-align: center; padding: 80px 24px;
+      font-family: 'Space Mono', monospace; color: var(--text-dim);
+      font-size: 0.75rem; line-height: 2;
+    }
+
+    .empty-state strong { color: var(--pink); }
+
+    /* ============================================================ DAY OVERLAY */
+    .day-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+      display: none; align-items: center; justify-content: center;
+      padding: 24px; z-index: 300; backdrop-filter: blur(6px);
+    }
+
+    .day-overlay.active { display: flex; }
+
+    .day-card {
+      width: 100%; max-width: 380px;
+      background: var(--panel); border: 1px solid var(--border);
+      outline: 2px solid var(--pink); outline-offset: 3px;
+      position: relative; overflow: hidden;
+    }
+
+    .day-card::before {
+      content: ''; position: absolute; top:0; left:0; right:0; height: 3px;
+      background: linear-gradient(90deg, var(--hot), var(--pink), var(--purple), var(--accent));
+    }
+
+    .day-card-head {
+      padding: 20px 20px 14px; display: flex; justify-content: space-between; align-items: flex-start;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .day-num { font-family: 'Archivo Black', sans-serif; font-size: 1.5rem; color: var(--text); }
+    .day-num span { color: var(--pink); }
+    .day-req { font-family: 'Space Mono', monospace; font-size: 0.6rem; color: var(--text-dim); margin-top: 4px; }
+
+    .close-btn {
+      background: none; border: none; color: var(--text-dim); cursor: pointer;
+      font-size: 0.9rem; font-family: 'Space Mono', monospace;
+      line-height: 1; padding: 2px 4px; transition: color 0.2s;
+    }
+
+    .close-btn:hover { color: var(--pink); }
+
+    .habit-list { padding: 10px 20px; }
+
+    .habit-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; cursor: pointer; user-select: none;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: opacity 0.15s;
+    }
+
+    .habit-row:last-child { border-bottom: none; }
+    .habit-row:hover { opacity: 0.8; }
+
+    .habit-check {
+      width: 20px; height: 20px; border: 2px solid var(--border); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; color: transparent;
+      font-family: 'Space Mono', monospace; transition: all 0.18s ease;
+    }
+
+    .habit-row.checked .habit-check {
+      background: var(--pink); border-color: var(--pink); color: var(--black);
+      box-shadow: 2px 2px 0 var(--hot);
+    }
+
+    .habit-name { font-size: 0.85rem; color: rgba(245,240,255,0.75); font-weight: 400; flex: 1; }
+
+    .day-card-foot {
+      padding: 12px 20px 18px; display: flex; justify-content: space-between; align-items: center;
+      background: rgba(0,0,0,0.25);
+    }
+
+    .completion-msg { font-family: 'Space Mono', monospace; font-size: 0.62rem; color: var(--text-dim); }
+    .completion-msg.ok  { color: var(--accent); }
+    .completion-msg.bad { color: var(--pink-light); }
+
+    .mark-btn {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--pink); color: var(--black); border: none;
+      padding: 10px 20px; cursor: pointer;
+      box-shadow: 3px 3px 0 var(--hot); transition: all 0.12s;
+    }
+
+    .mark-btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--hot); }
+    .mark-btn:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 var(--hot); }
+
+    /* ============================================================ TOAST */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--pink); color: var(--black);
+      padding: 10px 24px; font-family: 'Archivo Black', sans-serif;
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      z-index: 500; display: none;
+      box-shadow: 4px 4px 0 var(--hot); white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- INTRO -->
+  <div id="intro-screen">
+    <div class="deco" style="top:14%;left:7%;animation-delay:0.5s;animation-duration:6s;">✦</div>
+    <div class="deco" style="top:72%;left:5%;animation-delay:1.2s;animation-duration:8s;color:#b8ff57;">★</div>
+    <div class="deco" style="top:18%;right:9%;animation-delay:0.8s;animation-duration:7s;color:#c084fc;">◆</div>
+    <div class="deco" style="top:78%;right:7%;animation-delay:2s;animation-duration:5.5s;">✦</div>
+    <div class="deco" style="top:45%;left:4%;animation-delay:1.5s;animation-duration:9s;color:#ffe566;">✶</div>
+    <div class="deco" style="top:38%;right:5%;animation-delay:0.3s;animation-duration:7.5s;color:#ff6fa8;">◇</div>
+
+    <div class="intro-content">
+      <div class="boot-label">// initializing habit_mirror.exe</div>
+      <div class="boot-bar-wrap"><div class="boot-bar-fill"></div></div>
+      <div class="intro-headline">
+        <span class="headline-top">I AM THE</span>
+        <span class="headline-bottom">BETTER ME</span>
+      </div>
+      <div class="intro-sub"><span>no excuses</span></div>
+      <div class="intro-cta">
+        <button class="cta-btn" id="open-setup-btn">Start</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP MODAL -->
+  <div class="modal-overlay" id="setup-modal">
+    <div class="setup-modal">
+      <div class="modal-tag">New run</div>
+      <div class="modal-title">Set your rules.</div>
+      <div class="modal-sub">// define what counts as a win</div>
+      <form id="setup-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="totalDays">Days</label>
+            <input class="form-input" type="number" id="totalDays" min="1" max="365" value="90" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Daily threshold</label>
+            <div class="threshold-pills">
+              <label class="thresh-pill"><input type="radio" name="threshold" value="50" /><span>50%</span></label>
+              <label class="thresh-pill"><input type="radio" name="threshold" value="75" checked /><span>75%</span></label>
+              <label class="thresh-pill"><input type="radio" name="threshold" value="100" /><span>100%</span></label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="habits-label">Your non-negotiables — name + how many times per day</div>
+          <div class="habit-inputs-grid" id="habit-inputs">
+            <div class="habit-freq-row">
+              <input class="form-input" type="text" placeholder="Habit 1" data-index="0" value="No weed" />
+              <div class="freq-picker" data-index="0">
+                <button type="button" class="freq-btn active" data-val="1">1×</button>
+                <button type="button" class="freq-btn" data-val="2">2×</button>
+                <button type="button" class="freq-btn" data-val="3">3×</button>
+              </div>
+            </div>
+            <div class="habit-freq-row">
+              <input class="form-input" type="text" placeholder="Habit 2" data-index="1" value="Supplement protocol" />
+              <div class="freq-picker" data-index="1">
+                <button type="button" class="freq-btn active" data-val="1">1×</button>
+                <button type="button" class="freq-btn" data-val="2">2×</button>
+                <button type="button" class="freq-btn" data-val="3">3×</button>
+              </div>
+            </div>
+            <div class="habit-freq-row">
+              <input class="form-input" type="text" placeholder="Habit 3" data-index="2" value="Protein-included meals" />
+              <div class="freq-picker" data-index="2">
+                <button type="button" class="freq-btn" data-val="1">1×</button>
+                <button type="button" class="freq-btn" data-val="2">2×</button>
+                <button type="button" class="freq-btn active" data-val="3">3×</button>
+              </div>
+            </div>
+            <div class="habit-freq-row">
+              <input class="form-input" type="text" placeholder="Habit 4" data-index="3" value="30 min movement" />
+              <div class="freq-picker" data-index="3">
+                <button type="button" class="freq-btn active" data-val="1">1×</button>
+                <button type="button" class="freq-btn" data-val="2">2×</button>
+                <button type="button" class="freq-btn" data-val="3">3×</button>
+              </div>
+            </div>
+            <div class="habit-freq-row">
+              <input class="form-input" type="text" placeholder="Habit 5 (optional)" data-index="4" />
+              <div class="freq-picker" data-index="4">
+                <button type="button" class="freq-btn active" data-val="1">1×</button>
+                <button type="button" class="freq-btn" data-val="2">2×</button>
+                <button type="button" class="freq-btn" data-val="3">3×</button>
+              </div>
+            </div>
+            <div class="habit-freq-row">
+              <input class="form-input" type="text" placeholder="Habit 6 (optional)" data-index="5" />
+              <div class="freq-picker" data-index="5">
+                <button type="button" class="freq-btn active" data-val="1">1×</button>
+                <button type="button" class="freq-btn" data-val="2">2×</button>
+                <button type="button" class="freq-btn" data-val="3">3×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-ghost" id="cancel-setup-btn">cancel</button>
+          <button type="submit" class="btn-primary">Let's go ✦</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TRACKER -->
+  <div id="tracker-screen">
+    <div class="tracker-header">
+      <div class="header-brand">
+        <div class="brand-name">ACCOMPLISHMENT IS A HABIT</div>
+      </div>
+      <div class="header-right">
+        <div class="stats-pills">
+          <div class="stat-pill">
+            <div class="stat-pill-val pink" id="stat-done">0</div>
+            <div class="stat-pill-lbl">Done</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-val green" id="stat-streak">0</div>
+            <div class="stat-pill-lbl">Streak</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-pill-val" id="stat-total">90</div>
+            <div class="stat-pill-lbl">Days</div>
+          </div>
+        </div>
+        <button class="reset-btn" id="reset-btn">Reset</button>
+      </div>
+    </div>
+
+    <div class="progress-section" id="progress-section">
+      <div class="progress-meta">
+        <div class="progress-text" id="progress-text">Day 0 of 90</div>
+        <div class="progress-pct" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="notes-area">
+      <div class="notes-grid" id="notes-grid">
+        <div class="empty-state" id="empty-state">
+          <strong>no run yet.</strong><br>hit reset to go back and set your goals.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day overlay -->
+  <div class="day-overlay" id="day-overlay">
+    <div class="day-card">
+      <div class="day-card-head">
+        <div>
+          <div class="day-num" id="overlay-title">Day <span>1</span></div>
+          <div class="day-req" id="overlay-sub"></div>
+        </div>
+        <button class="close-btn" id="overlay-close">[x]</button>
+      </div>
+      <div class="habit-list" id="habit-list"></div>
+      <div class="day-card-foot">
+        <div class="completion-msg" id="completion-text"></div>
+        <button class="mark-btn" id="save-day-btn">Mark done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    const KEY='habit-mirror-v15';
+    let settings=null, days=[], currentDay=null;
+
+    const save  = () => { try { localStorage.setItem(KEY, JSON.stringify({settings,days})); } catch(e){} };
+    const clear = () => { try { localStorage.removeItem(KEY); } catch(e){} };
+
+    function load() {
+      try {
+        const r = localStorage.getItem(KEY);
+        if (!r) return null;
+        const p = JSON.parse(r);
+        return (p?.settings && Array.isArray(p.days)) ? p : null;
+      } catch(e) { return null; }
+    }
+
+    function normalize(data) {
+      if (!data?.settings) return null;
+      const s = data.settings;
+      const totalDays = Math.min(365, Math.max(1, parseInt(s.totalDays)||90));
+      let habits = (Array.isArray(s.habits) ? s.habits : [])
+        .map(h => ({ name: String(h.name||h||'').trim(), freq: Math.min(3, Math.max(1, parseInt(h.freq)||1)) }))
+        .filter(h => h.name);
+      if (!habits.length) habits = [{name:'Habit 1', freq:1}];
+      if (habits.length > 6) habits = habits.slice(0,6);
+      const threshold = [50,75,100].includes(parseInt(s.threshold)) ? parseInt(s.threshold) : 75;
+
+      const normDays = Array.from({length:totalDays}, (_,i) => {
+        const src = (data.days||[])[i] || {};
+        // counts: array of numbers (how many times each habit checked)
+        const counts = Array.from({length:habits.length}, (_,j) => {
+          const v = Array.isArray(src.counts) ? (parseInt(src.counts[j])||0) : 0;
+          return Math.min(v, habits[j].freq);
+        });
+        const totalPossible = habits.reduce((a,h) => a+h.freq, 0);
+        const totalDone = counts.reduce((a,c) => a+c, 0);
+        const pct = totalPossible > 0 ? Math.round((totalDone/totalPossible)*100) : 0;
+        return { counts, complete: pct >= threshold, partial: totalDone > 0 && pct < threshold };
+      });
+
+      return { settings:{totalDays, habits, threshold}, days:normDays };
+    }
+
+    function toast(msg) {
+      const el=document.getElementById('toast');
+      el.textContent=msg; el.style.display='block';
+      clearTimeout(toast._t);
+      toast._t=setTimeout(()=>el.style.display='none', 2200);
+    }
+
+    // ---- Frequency picker interactions in setup ----
+    document.querySelectorAll('.freq-picker').forEach(picker => {
+      picker.querySelectorAll('.freq-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          picker.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        });
+      });
+    });
+
+    // ---- RENDER GRID ----
+    function renderGrid() {
+      const grid  = document.getElementById('notes-grid');
+      const empty = document.getElementById('empty-state');
+      const prog  = document.getElementById('progress-section');
+      grid.querySelectorAll('.sticky').forEach(n=>n.remove());
+
+      if (!settings||!days.length) {
+        if (empty) empty.style.display='';
+        prog.classList.remove('visible');
+        return;
+      }
+      if (empty) empty.style.display='none';
+      prog.classList.add('visible');
+
+      const fi = days.findIndex(d => !d.complete);
+
+      days.forEach((day, i) => {
+        const note = document.createElement('div');
+        let cls = 'sticky';
+        if (day.complete) cls += ' done';
+        else if (day.partial) cls += ' partial';
+        if (fi === i && !day.complete) cls += ' today';
+        note.className = cls;
+
+        const tilt = (((i*13)%9)-4)*0.4;
+        note.style.setProperty('--tilt', `${tilt}deg`);
+
+        const xDiv  = document.createElement('div'); xDiv.className='sticky-x';
+        const inner = document.createElement('div'); inner.className='sticky-inner';
+        const lbl   = document.createElement('span'); lbl.className='sticky-label'; lbl.textContent='day';
+        const num   = document.createElement('span'); num.className='sticky-num'; num.textContent=i+1;
+
+        inner.appendChild(lbl); inner.appendChild(num);
+        note.appendChild(xDiv); note.appendChild(inner);
+        note.addEventListener('click', ()=>openDay(i));
+        grid.appendChild(note);
+      });
+
+      updateProgress();
+    }
+
+    function updateProgress() {
+      if (!settings) return;
+      const done = days.filter(d=>d.complete).length;
+      const pct  = Math.round((done/settings.totalDays)*100);
+      document.getElementById('progress-fill').style.width = pct+'%';
+      document.getElementById('progress-pct').textContent  = pct+'%';
+      document.getElementById('progress-text').textContent = `Day ${done} of ${settings.totalDays}`;
+    }
+
+    function updateStats() {
+      if (!settings) return;
+      const done = days.filter(d=>d.complete).length;
+      let streak = 0;
+      for (let i=days.length-1; i>=0; i--) { if(days[i].complete) streak++; else break; }
+      document.getElementById('stat-done').textContent   = done;
+      document.getElementById('stat-streak').textContent = streak;
+      document.getElementById('stat-total').textContent  = settings.totalDays;
+    }
+
+    // ---- DAY OVERLAY ----
+    function openDay(i) {
+      currentDay = i;
+      const day = days[i];
+      document.getElementById('overlay-title').innerHTML = `Day <span>${i+1}</span>`;
+
+      const totalPossible = settings.habits.reduce((a,h)=>a+h.freq,0);
+      document.getElementById('overlay-sub').textContent =
+        `// ${settings.threshold}% threshold · ${totalPossible} total checks`;
+
+      const list = document.getElementById('habit-list');
+      list.innerHTML = '';
+
+      settings.habits.forEach((habit, hi) => {
+        const row = document.createElement('div');
+        row.className = 'habit-row';
+        row.style.cursor = 'default';
+
+        const nameEl = document.createElement('div');
+        nameEl.className = 'habit-name';
+        nameEl.textContent = habit.name;
+
+        const checks = document.createElement('div');
+        checks.className = 'habit-checks';
+
+        for (let c = 0; c < habit.freq; c++) {
+          const box = document.createElement('div');
+          box.className = 'habit-check' + (c < (day.counts[hi]||0) ? ' checked' : '');
+          box.textContent = '✓';
+          const checkIndex = c;
+          box.addEventListener('click', () => {
+            const current = day.counts[hi]||0;
+            // clicking a checked box unchecks from the right; clicking unchecked checks next
+            if (checkIndex < current) {
+              day.counts[hi] = checkIndex; // uncheck from this point
+            } else {
+              day.counts[hi] = checkIndex + 1;
+            }
+            // re-render checks
+            checks.querySelectorAll('.habit-check').forEach((b,idx) => {
+              b.classList.toggle('checked', idx < day.counts[hi]);
+            });
+            syncCompletion(day);
+          });
+          checks.appendChild(box);
+        }
+
+        row.appendChild(nameEl);
+        row.appendChild(checks);
+        list.appendChild(row);
+      });
+
+      syncCompletion(day);
+      document.getElementById('day-overlay').classList.add('active');
+    }
+
+    function calcDayPct(day) {
+      const totalPossible = settings.habits.reduce((a,h)=>a+h.freq, 0);
+      const totalDone = (day.counts||[]).reduce((a,c)=>a+c, 0);
+      return totalPossible > 0 ? Math.round((totalDone/totalPossible)*100) : 0;
+    }
+
+    function syncCompletion(day) {
+      const pct    = calcDayPct(day);
+      const needed = settings.threshold;
+      const el     = document.getElementById('completion-text');
+      if (pct >= needed) {
+        el.className = 'completion-msg ok';
+        el.textContent = `${pct}% ✓ above ${needed}% threshold`;
+      } else {
+        el.className = 'completion-msg bad';
+        el.textContent = `${pct}% · need ${needed}% to complete`;
+      }
+    }
+
+    function closeDay() {
+      document.getElementById('day-overlay').classList.remove('active');
+      currentDay = null;
+    }
+
+    function showTracker() {
+      document.getElementById('intro-screen').style.display='none';
+      document.getElementById('tracker-screen').classList.add('active');
+      renderGrid();
+      updateStats();
+    }
+
+    // ---- EVENTS ----
+    document.getElementById('open-setup-btn').addEventListener('click', ()=>
+      document.getElementById('setup-modal').classList.add('active'));
+
+    document.getElementById('cancel-setup-btn').addEventListener('click', ()=>
+      document.getElementById('setup-modal').classList.remove('active'));
+
+    document.getElementById('setup-modal').addEventListener('click', e=>{
+      if (e.target.id==='setup-modal') document.getElementById('setup-modal').classList.remove('active');
+    });
+
+    document.getElementById('setup-form').addEventListener('submit', e => {
+      e.preventDefault();
+      const totalDays = Math.min(365, Math.max(1, parseInt(document.getElementById('totalDays').value)||90));
+      const threshold = parseInt(document.querySelector('input[name="threshold"]:checked')?.value||'75');
+
+      let habits = [];
+      document.querySelectorAll('#habit-inputs .habit-freq-row').forEach(row => {
+        const name = row.querySelector('input[type="text"]').value.trim();
+        if (!name) return;
+        const activeFreq = row.querySelector('.freq-btn.active');
+        const freq = activeFreq ? parseInt(activeFreq.dataset.val)||1 : 1;
+        habits.push({ name, freq });
+      });
+
+      if (!habits.length) habits = [{name:'Habit 1', freq:1}];
+      if (habits.length > 6) habits = habits.slice(0,6);
+
+      settings = { totalDays, habits, threshold };
+      days = Array.from({length:totalDays}, () => ({
+        counts: Array.from({length:habits.length}, ()=>0),
+        complete: false,
+        partial: false
+      }));
+
+      save();
+      document.getElementById('setup-modal').classList.remove('active');
+      showTracker();
+    });
+
+    document.getElementById('overlay-close').addEventListener('click', closeDay);
+    document.getElementById('day-overlay').addEventListener('click', e=>{
+      if (e.target.id==='day-overlay') closeDay();
+    });
+
+    document.getElementById('save-day-btn').addEventListener('click', () => {
+      if (currentDay==null) return;
+      const day = days[currentDay];
+      const pct = calcDayPct(day);
+      day.complete = pct >= settings.threshold;
+      day.partial  = !day.complete && pct > 0;
+      save(); renderGrid(); updateStats(); closeDay();
+      if (day.complete) toast(`Day ${currentDay+1} complete ✦`);
+      else if (day.partial) toast(`Day ${currentDay+1} logged — keep going`);
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (!confirm('Reset everything?')) return;
+      settings=null; days=[]; clear();
+      document.getElementById('tracker-screen').classList.remove('active');
+      document.getElementById('intro-screen').style.display='';
+    });
+
+    (function init() {
+      const data = normalize(load());
+      if (data) { settings=data.settings; days=data.days; showTracker(); }
+    })();
+  </script>
+</body>
+</html>
