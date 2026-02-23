@@ -423,24 +423,31 @@
     .habit-freq-row .form-input { flex: 1; }
 
     .freq-picker {
-      display: flex; gap: 3px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 0; flex-shrink: 0;
     }
 
-    .freq-btn {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.6rem; letter-spacing: 0.04em;
-      width: 28px; height: 38px;
+    .freq-step-btn {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 1rem; line-height: 1;
+      width: 30px; height: 38px;
       background: var(--dark); border: 1px solid var(--border);
       color: var(--text-dim); cursor: pointer;
-      transition: all 0.12s;
+      transition: all 0.12s; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    .freq-btn.active {
-      background: var(--pink); border-color: var(--pink);
-      color: var(--black); box-shadow: 2px 2px 0 var(--hot);
-    }
+    .freq-step-btn:hover { border-color: var(--pink); color: var(--pink); }
+    .freq-step-btn:active { background: var(--pink); color: var(--black); border-color: var(--pink); }
 
-    .freq-btn:hover:not(.active) { border-color: var(--pink); color: var(--pink-light); }
+    .freq-step-val {
+      font-family: 'Archivo Black', sans-serif;
+      font-size: 0.85rem; line-height: 1;
+      width: 36px; height: 38px;
+      background: var(--panel); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      color: var(--text); border-left: none; border-right: none;
+      display: flex; align-items: center; justify-content: center;
+      user-select: none;
+    }
 
     /* Habit check row — multiple checks for frequency > 1 */
     .habit-checks {
@@ -963,50 +970,50 @@
           <div class="habit-inputs-grid" id="habit-inputs">
             <div class="habit-freq-row">
               <input class="form-input" type="text" placeholder="e.g. Gallon of water" data-index="0" />
-              <div class="freq-picker" data-index="0">
-                <button type="button" class="freq-btn active" data-val="1">1×</button>
-                <button type="button" class="freq-btn" data-val="2">2×</button>
-                <button type="button" class="freq-btn" data-val="3">3×</button>
+              <div class="freq-picker">
+                <button type="button" class="freq-step-btn" data-action="dec">−</button>
+                <div class="freq-step-val">1</div>
+                <button type="button" class="freq-step-btn" data-action="inc">+</button>
               </div>
             </div>
             <div class="habit-freq-row">
               <input class="form-input" type="text" placeholder="e.g. No alcohol" data-index="1" />
-              <div class="freq-picker" data-index="1">
-                <button type="button" class="freq-btn active" data-val="1">1×</button>
-                <button type="button" class="freq-btn" data-val="2">2×</button>
-                <button type="button" class="freq-btn" data-val="3">3×</button>
+              <div class="freq-picker">
+                <button type="button" class="freq-step-btn" data-action="dec">−</button>
+                <div class="freq-step-val">1</div>
+                <button type="button" class="freq-step-btn" data-action="inc">+</button>
               </div>
             </div>
             <div class="habit-freq-row">
               <input class="form-input" type="text" placeholder="e.g. Protein-rich meal" data-index="2" />
-              <div class="freq-picker" data-index="2">
-                <button type="button" class="freq-btn active" data-val="1">1×</button>
-                <button type="button" class="freq-btn" data-val="2">2×</button>
-                <button type="button" class="freq-btn" data-val="3">3×</button>
+              <div class="freq-picker">
+                <button type="button" class="freq-step-btn" data-action="dec">−</button>
+                <div class="freq-step-val">1</div>
+                <button type="button" class="freq-step-btn" data-action="inc">+</button>
               </div>
             </div>
             <div class="habit-freq-row">
               <input class="form-input" type="text" placeholder="e.g. 30 min movement" data-index="3" />
-              <div class="freq-picker" data-index="3">
-                <button type="button" class="freq-btn active" data-val="1">1×</button>
-                <button type="button" class="freq-btn" data-val="2">2×</button>
-                <button type="button" class="freq-btn" data-val="3">3×</button>
+              <div class="freq-picker">
+                <button type="button" class="freq-step-btn" data-action="dec">−</button>
+                <div class="freq-step-val">1</div>
+                <button type="button" class="freq-step-btn" data-action="inc">+</button>
               </div>
             </div>
             <div class="habit-freq-row">
               <input class="form-input" type="text" placeholder="Habit 5 (optional)" data-index="4" />
-              <div class="freq-picker" data-index="4">
-                <button type="button" class="freq-btn active" data-val="1">1×</button>
-                <button type="button" class="freq-btn" data-val="2">2×</button>
-                <button type="button" class="freq-btn" data-val="3">3×</button>
+              <div class="freq-picker">
+                <button type="button" class="freq-step-btn" data-action="dec">−</button>
+                <div class="freq-step-val">1</div>
+                <button type="button" class="freq-step-btn" data-action="inc">+</button>
               </div>
             </div>
             <div class="habit-freq-row">
               <input class="form-input" type="text" placeholder="Habit 6 (optional)" data-index="5" />
-              <div class="freq-picker" data-index="5">
-                <button type="button" class="freq-btn active" data-val="1">1×</button>
-                <button type="button" class="freq-btn" data-val="2">2×</button>
-                <button type="button" class="freq-btn" data-val="3">3×</button>
+              <div class="freq-picker">
+                <button type="button" class="freq-step-btn" data-action="dec">−</button>
+                <div class="freq-step-val">1</div>
+                <button type="button" class="freq-step-btn" data-action="inc">+</button>
               </div>
             </div>
           </div>
@@ -1237,12 +1244,15 @@
       toast._t = setTimeout(() => el.style.display='none', 2200);
     }
 
-    // ---- FREQUENCY PICKERS ----
+    // ---- FREQUENCY STEPPERS ----
     document.querySelectorAll('.freq-picker').forEach(picker => {
-      picker.querySelectorAll('.freq-btn').forEach(btn => {
+      const valEl = picker.querySelector('.freq-step-val');
+      picker.querySelectorAll('.freq-step-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-          picker.querySelectorAll('.freq-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
+          let v = parseInt(valEl.textContent) || 1;
+          if (btn.dataset.action === 'inc') v = Math.min(10, v + 1);
+          else v = Math.max(1, v - 1);
+          valEl.textContent = v;
         });
       });
     });
@@ -1575,8 +1585,8 @@
       document.querySelectorAll('#habit-inputs .habit-freq-row').forEach(row => {
         const name = row.querySelector('input[type="text"]').value.trim();
         if (!name) return;
-        const activeFreq = row.querySelector('.freq-btn.active');
-        const freq = activeFreq ? parseInt(activeFreq.dataset.val)||1 : 1;
+        const activeFreq = row.querySelector('.freq-step-val');
+        const freq = activeFreq ? Math.min(10, Math.max(1, parseInt(activeFreq.textContent)||1)) : 1;
         habits.push({name, freq});
       });
 
